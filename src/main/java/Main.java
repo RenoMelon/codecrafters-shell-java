@@ -9,7 +9,7 @@ public class Main {
         System.out.print("$ ");
 
         String command = myObj.nextLine();
-        System.out.println(command + ":command not found");
+        System.out.println(command + ": command not found");
 
     }
 }
