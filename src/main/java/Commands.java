@@ -1,6 +1,8 @@
+import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 interface Command {
     void execute(String[] args);
@@ -46,14 +48,24 @@ class Type implements Command{
             System.out.println("type: missing operand");
             return;
         }
+        String PATH = System.getenv("PATH");
+        String[] paths = PATH.split(File.pathSeparator);
 
         String commandName = args[1];
+
 
         Command cmd = Commands.get(commandName);
         if(cmd != null){
             System.out.println(commandName + " is a shell builtin");
         }
         else{
+            for(String path : paths){
+                File file = new File(path, commandName);
+                if(file.exists() && file.canExecute()){
+                    System.out.println(commandName + " is " + file.getAbsolutePath());
+                    return;
+                }
+            }
             System.out.println(commandName + " not found");
         }
 
