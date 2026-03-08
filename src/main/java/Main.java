@@ -1,3 +1,4 @@
+import java.util.Objects;
 import java.util.Scanner;
 
 public class Main {
@@ -7,8 +8,11 @@ public class Main {
 
         while (true){
             System.out.print("$ ");
-            String command = myScanner.nextLine();
-            System.out.println(command + ": command not found");
+            String input = myScanner.nextLine();
+            if(input.equals("exit")){
+                System.exit(0);
+            }
+            System.out.println(input + ": command not found");
         }
 
     }
