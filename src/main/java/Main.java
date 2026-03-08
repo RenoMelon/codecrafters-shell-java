@@ -1,21 +1,26 @@
-import java.util.Objects;
-import java.util.Scanner;
+import java.util.*;
 
 public class Main {
     public static void main(String[] args) throws Exception {
 
-        Scanner myScanner = new Scanner(System.in);
+        Scanner scanner = new Scanner(System.in);
+
 
         while (true){
             System.out.print("$ ");
-            String input = myScanner.nextLine();
-            if(input.equals("exit")){
-                System.exit(0);
-            } else if (input.startsWith("echo ")) {
-                System.out.println(input.substring(5));
-            }
-            else{
-                System.out.println(input + ": command not found");
+            String input = scanner.nextLine().trim();
+
+            if(input.isEmpty()) continue;
+
+            String[] parts = input.split(" ");
+            String commandName = parts[0];
+
+            Command command = Commands.get(commandName);
+
+            if(command != null){
+                command.execute(parts);
+            }else{
+                System.out.println(commandName + ": command not found");
             }
 
         }
