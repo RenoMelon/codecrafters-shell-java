@@ -13,6 +13,7 @@ public class Commands {
         commands.put("echo", new Echo());
         commands.put("type", new Type());
         commands.put("pwd", new Pwd());
+        commands.put("cd", new Cd());
     }
 
     public static Command get(String name){
@@ -90,5 +91,23 @@ class Pwd implements Command{
     public void execute(String[] args) {
         String userDirectory = System.getProperty("user.dir");
         System.out.println(userDirectory);
+    }
+}
+
+class Cd implements Command{
+
+    public void execute(String[] args) {
+        // get requested dir out of args
+        // check if directory exists
+        // if not print error and stay in current directory
+        // if yes change to that directory with System.setProperty
+
+        String requestedDir = args[1];
+
+        System.setProperty("user.dir", requestedDir);
+
+
+
+
     }
 }
