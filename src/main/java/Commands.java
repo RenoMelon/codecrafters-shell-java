@@ -10,6 +10,7 @@ interface Command {
 
 public class Commands {
     private static final Map<String, Command> commands = new HashMap<>();
+    public static Path currentWorkingDir = Paths.get(System.getProperty("user.dir"));
 
     static {
         commands.put("exit", new Exit());
@@ -56,7 +57,7 @@ class Echo implements Command{
 
     public void execute(String[] args) {
         if(args.length > 1) System.out.println(String.join(" ", Arrays.copyOfRange(args, 1, args.length)));
-        else System.out.println("echo. missing operand");
+        else System.out.println("echo: missing operand");
     }
 }
 
@@ -67,12 +68,8 @@ class Type implements Command{
             System.out.println("type: missing operand");
             return;
         }
-        String PATH = System.getenv("PATH");
-        String[] paths = PATH.split(File.pathSeparator);
 
         String commandName = args[1];
-
-
         Command cmd = Commands.get(commandName);
         if(cmd != null){
             System.out.println(commandName + " is a shell builtin");
@@ -92,28 +89,24 @@ class Type implements Command{
 class Pwd implements Command{
 
     public void execute(String[] args) {
-        String userDirectory = System.getProperty("user.dir");
-        System.out.println(userDirectory);
+        System.out.println(Commands.currentWorkingDir.toAbsolutePath());
     }
 }
 
 class Cd implements Command{
 
     public void execute(String[] args) {
-        // get requested dir out of args
-        // check if directory exists
-        // if not print error and stay in current directory
-        // if yes change to that directory with System.setProperty
-
-        String requestedDir = args[1];
-        Path requestedPath = Paths.get(args[1]);
-
-        if(Files.exists(requestedPath)){
-            System.setProperty("user.dir", requestedDir);
-        }else {
-            System.out.println("cd: " + requestedDir + ": " + "No such file or directory");
+        if(args.length < 2){
+            System.out.println("cd: missing operand");
+            return;
         }
+        Path requestedPath = Commands.currentWorkingDir.resolve(args[1]);
 
+        if(Files.isDirectory(requestedPath)){
+            Commands.currentWorkingDir = requestedPath.normalize();
+        } else {
+            System.out.println("cd: " + args[1] + ": " + "No such file or directory");
+        }
 
     }
 }
