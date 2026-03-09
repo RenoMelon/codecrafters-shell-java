@@ -100,6 +100,15 @@ class Cd implements Command{
             System.out.println("cd: missing operand");
             return;
         }
+        //mss later nog zorgen voor subdir navigatie mogelijkheid met ~ (bv ~/Documents)
+        if(args[1].startsWith("~")){
+            String home = System.getenv("HOME");
+            if(home == null) home = System.getProperty("user.home");
+            Path homeDir = Paths.get(home);
+            Commands.currentWorkingDir = homeDir.normalize();
+            return;
+        }
+
         Path requestedPath = Commands.currentWorkingDir.resolve(args[1]);
 
         if(Files.isDirectory(requestedPath)){
