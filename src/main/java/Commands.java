@@ -1,4 +1,7 @@
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 interface Command {
@@ -103,10 +106,13 @@ class Cd implements Command{
         // if yes change to that directory with System.setProperty
 
         String requestedDir = args[1];
+        Path requestedPath = Paths.get(args[1]);
 
-        System.setProperty("user.dir", requestedDir);
-
-
+        if(Files.exists(requestedPath)){
+            System.setProperty("user.dir", requestedDir);
+        }else {
+            System.out.println("cd: " + requestedDir + ": " + "No such file or directory");
+        }
 
 
     }
