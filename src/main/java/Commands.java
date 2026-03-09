@@ -1,8 +1,5 @@
 import java.io.File;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 interface Command {
     void execute(String[] args);
@@ -23,6 +20,23 @@ public class Commands {
     /*public boolean getCommands(String command){
         return this.commands.containsKey(command);
     }*/
+
+    public static Optional<String> pathResolver(String commandName){
+        String PATH = System.getenv("PATH");
+        if(PATH == null || PATH.isEmpty()){
+            return Optional.empty();
+        }
+        String[] paths = PATH.split(File.pathSeparator);
+
+        for(String path : paths){
+            File file = new File(path, commandName);
+            if(file.exists() && file.canExecute()){
+                return Optional.of(file.getAbsolutePath());
+            }
+        }
+        return Optional.empty();
+    }
+
 }
 
 class Exit implements Command{
