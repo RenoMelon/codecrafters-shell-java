@@ -12,6 +12,7 @@ public class Commands {
         commands.put("exit", new Exit());
         commands.put("echo", new Echo());
         commands.put("type", new Type());
+        commands.put("pwd", new Pwd());
     }
 
     public static Command get(String name){
@@ -73,15 +74,21 @@ class Type implements Command{
             System.out.println(commandName + " is a shell builtin");
         }
         else{
-            for(String path : paths){
-                File file = new File(path, commandName);
-                if(file.exists() && file.canExecute()){
-                    System.out.println(commandName + " is " + file.getAbsolutePath());
-                    return;
-                }
+            String commandPath = Commands.pathResolver(commandName).orElse("");
+            if(commandPath.isEmpty()){
+                System.out.println(commandName + " not found");
+            }else{
+                System.out.println(commandName + " is " + commandPath);
             }
-            System.out.println(commandName + " not found");
         }
 
+    }
+}
+
+class Pwd implements Command{
+
+    public void execute(String[] args) {
+        String userDirectory = System.getProperty("user.dir");
+        System.out.println(userDirectory);
     }
 }
