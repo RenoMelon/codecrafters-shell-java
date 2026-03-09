@@ -26,8 +26,19 @@ public class Main {
                 try{
                     Optional<String> fullPath = Commands.pathResolver(commandName);
                     if(fullPath.isPresent()){
-                        parts[0] = fullPath.get();
-                        ProcessBuilder pb = new ProcessBuilder(parts);
+
+                        String[] cmdArgs = Arrays.copyOfRange(parts, 1, parts.length);
+                        StringBuilder sb = new StringBuilder();
+                        sb.append("exec -a ");
+                        sb.append(commandName);
+                        sb.append(" ");
+                        sb.append(fullPath.get());
+                        for(String arg : cmdArgs){
+                            sb.append(" ");
+                            sb.append(arg);
+                        }
+                        List<String> commandList = Arrays.asList("/bin/sh", "-c", sb.toString());
+                        ProcessBuilder pb = new ProcessBuilder(commandList);
                         pb.inheritIO();
                         Process process = pb.start();
                         process.waitFor();
