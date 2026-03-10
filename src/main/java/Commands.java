@@ -23,9 +23,6 @@ public class Commands {
     public static Command get(String name){
         return commands.get(name);
     }
-    /*public boolean getCommands(String command){
-        return this.commands.containsKey(command);
-    }*/
 
     public static Optional<String> pathResolver(String commandName){
         String PATH = System.getenv("PATH");
@@ -41,6 +38,30 @@ public class Commands {
             }
         }
         return Optional.empty();
+    }
+
+    public static List<String> inputTokenizer(String input){
+        List<String> args = new ArrayList<>();
+        StringBuilder currentArg = new StringBuilder();
+        boolean inSingleQuote = false;
+        for(char c : input.toCharArray()){
+            if(c == '\''){
+                inSingleQuote = !inSingleQuote;
+            } else if (c == ' ' && !inSingleQuote) {
+                if(!currentArg.isEmpty()){
+                    args.add(currentArg.toString());
+                    currentArg = new StringBuilder();
+                }
+            }else{
+                currentArg.append(c);
+            }
+        }
+
+        if(!currentArg.isEmpty()){
+            args.add(currentArg.toString());
+        }
+
+        return args;
     }
 
 }

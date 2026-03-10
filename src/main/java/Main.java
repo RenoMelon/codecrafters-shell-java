@@ -13,7 +13,7 @@ public class Main {
 
             if(input.isEmpty()) continue;
 
-            String[] parts = input.split(" ");
+            String[] parts = Commands.inputTokenizer(input).toArray(new String[0]);
             String commandName = parts[0];
 
 
