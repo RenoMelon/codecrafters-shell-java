@@ -44,10 +44,14 @@ public class Commands {
         List<String> args = new ArrayList<>();
         StringBuilder currentArg = new StringBuilder();
         boolean inSingleQuote = false;
+        boolean inDoubleQuote = false;
+        //echo "hey 'Jan'"
         for(char c : input.toCharArray()){
-            if(c == '\''){
+            if(c == '\'' && !inDoubleQuote){
                 inSingleQuote = !inSingleQuote;
-            } else if (c == ' ' && !inSingleQuote) {
+            } else if (c == '"' && !inSingleQuote) {
+                inDoubleQuote = !inDoubleQuote;
+            } else if (c == ' ' && !inSingleQuote && !inDoubleQuote) {
                 if(!currentArg.isEmpty()){
                     args.add(currentArg.toString());
                     currentArg = new StringBuilder();
