@@ -49,10 +49,15 @@ public class Commands {
 
         for(char c : input.toCharArray()){
             if(escaped){
-                currentArg.append(c);
-                escaped = false;
+                if(inDoubleQuote && c == '\'' || c == '"'){
+                    currentArg.append('\\' + c);
+                    escaped = false;
+                }else{
+                    currentArg.append(c);
+                    escaped = false;
+                }
             }
-            else if(c == '\\' && !inSingleQuote && !inDoubleQuote){
+            else if(c == '\\' && !inSingleQuote){
                 escaped = true;
             } else if(c == '\'' && !inDoubleQuote){
                 inSingleQuote = !inSingleQuote;
