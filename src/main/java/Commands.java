@@ -49,7 +49,7 @@ public class Commands {
 
         for(char c : input.toCharArray()){
             if(escaped){
-                if(inDoubleQuote && c != '\'' || c != '"'){
+                if(inDoubleQuote && c != '"' && c != '\\'){
                     currentArg.append('\\');
                     currentArg.append(c);
                 }else{
