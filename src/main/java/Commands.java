@@ -45,9 +45,16 @@ public class Commands {
         StringBuilder currentArg = new StringBuilder();
         boolean inSingleQuote = false;
         boolean inDoubleQuote = false;
-        //echo "hey 'Jan'"
+        boolean escaped = false;
+
         for(char c : input.toCharArray()){
-            if(c == '\'' && !inDoubleQuote){
+            if(escaped){
+                currentArg.append(c);
+                escaped = false;
+            }
+            else if(c == '\\' && !inSingleQuote && !inDoubleQuote){
+                escaped = true;
+            } else if(c == '\'' && !inDoubleQuote){
                 inSingleQuote = !inSingleQuote;
             } else if (c == '"' && !inSingleQuote) {
                 inDoubleQuote = !inDoubleQuote;
@@ -59,6 +66,7 @@ public class Commands {
             }else{
                 currentArg.append(c);
             }
+
         }
 
         if(!currentArg.isEmpty()){
