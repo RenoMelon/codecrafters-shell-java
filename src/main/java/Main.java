@@ -34,8 +34,9 @@ public class Main {
                         sb.append(" ");
                         sb.append(fullPath.get());
                         for(String arg : cmdArgs){
-                            sb.append(" ");
-                            sb.append(arg);
+                            sb.append(" '");
+                            sb.append(arg.replace("'", "'\\''"));
+                            sb.append("'");
                         }
                         List<String> commandList = Arrays.asList("/bin/sh", "-c", sb.toString());
                         ProcessBuilder pb = new ProcessBuilder(commandList);
