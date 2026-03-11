@@ -46,7 +46,7 @@ public class Commands {
         boolean inSingleQuote = false;
         boolean inDoubleQuote = false;
         boolean escaped = false;
-
+//hm
         for(char c : input.toCharArray()){
             if(escaped){
                 if(inDoubleQuote && c != '"' && c != '\\'){
