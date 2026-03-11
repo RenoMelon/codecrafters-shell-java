@@ -40,8 +40,6 @@ public class Commands {
         return Optional.empty();
     }
 
-    //te
-
     public static List<String> inputTokenizer(String input){
         List<String> args = new ArrayList<>();
         StringBuilder currentArg = new StringBuilder();
