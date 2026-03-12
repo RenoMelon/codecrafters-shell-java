@@ -14,8 +14,9 @@ public class Main {
             if(input.isEmpty()) continue;
 
             List<String> tokens = Commands.inputTokenizer(input);
-            String stdOutFile = Commands.parseRedirection(tokens).get("stdout");
-            String stdErrFile = Commands.parseRedirection(tokens).get("stderr");
+            Map<String, String> redirections = Commands.parseRedirection(tokens);
+            String stdOutFile = redirections.get("stdout");
+            String stdErrFile = redirections.get("stderr");
             String[] parts = tokens.toArray(new String[0]);
 
             String commandName = parts[0];
@@ -59,12 +60,13 @@ public class Main {
                         ProcessBuilder pb = new ProcessBuilder(commandList);
                         if(stdOutFile != null){
                             pb.redirectOutput(new File(stdOutFile));
-                            pb.redirectError(ProcessBuilder.Redirect.INHERIT);
-                        } else if (stdErrFile != null) {
-                            pb.redirectError(new File(stdErrFile));
+                        }else{
                             pb.redirectOutput(ProcessBuilder.Redirect.INHERIT);
-                        } else{
-                            pb.inheritIO();
+                        }
+                        if(stdErrFile != null){
+                            pb.redirectError(new File(stdErrFile));
+                        }else{
+                            pb.redirectError(ProcessBuilder.Redirect.INHERIT);
                         }
 
                         Process process = pb.start();
