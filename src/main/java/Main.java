@@ -29,10 +29,11 @@ public class Main {
 
                         String[] cmdArgs = Arrays.copyOfRange(parts, 1, parts.length);
                         StringBuilder sb = new StringBuilder();
-                        sb.append("exec -a ");
+                        sb.append("exec -a '");
                         sb.append(commandName.replace("'", "'\\''"));
-                        sb.append(" ");
+                        sb.append("' '");
                         sb.append(fullPath.get().replace("'", "'\\''"));
+                        sb.append("'");
                         for(String arg : cmdArgs){
                             sb.append(" '");
                             sb.append(arg.replace("'", "'\\''"));
