@@ -81,17 +81,32 @@ public class Commands {
         return args;
     }
 
-    public static String parseRedirection(List<String> tokens){
+    public static Map<String, String> parseRedirection(List<String> tokens){
+        Map<String, String> redirectionMap = new HashMap<>();
         String stdOutFile = null;
-        int i = tokens.indexOf(">");
+        String stdErrFile = null;
 
+        int i = tokens.indexOf(">");
         if(i == -1) i = tokens.indexOf("1>");
+
         if(i != -1){
             stdOutFile = tokens.get(i + 1);
             tokens.remove(i + 1);
             tokens.remove(i);
         }
-        return stdOutFile;
+
+        int j = tokens.indexOf("2>");
+        if(j != -1){
+            stdErrFile = tokens.get(j + 1);
+            tokens.remove(j + 1);
+            tokens.remove(j);
+        }
+
+        redirectionMap.put("stdout", stdOutFile);
+        redirectionMap.put("stderr", stdErrFile);
+
+        return redirectionMap;
+
     }
 
 }

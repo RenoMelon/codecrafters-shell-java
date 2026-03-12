@@ -1,7 +1,4 @@
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
+import java.io.*;
 import java.util.*;
 
 public class Main {
@@ -17,7 +14,8 @@ public class Main {
             if(input.isEmpty()) continue;
 
             List<String> tokens = Commands.inputTokenizer(input);
-            String stdOutFile = Commands.parseRedirection(tokens);
+            String stdOutFile = Commands.parseRedirection(tokens).get("stdout");
+            String stdErrFile = Commands.parseRedirection(tokens).get("stderr");
             String[] parts = tokens.toArray(new String[0]);
 
             String commandName = parts[0];
@@ -30,6 +28,9 @@ public class Main {
 
                 if(stdOutFile != null){
                     System.setOut(new PrintStream(new FileOutputStream(stdOutFile)));
+                }
+                if(stdErrFile != null){
+                    System.setErr(new PrintStream(new FileOutputStream(stdErrFile)));
                 }
 
                 command.execute(parts);
@@ -57,7 +58,10 @@ public class Main {
                         if(stdOutFile != null){
                             pb.redirectOutput(new File(stdOutFile));
                             pb.redirectError(ProcessBuilder.Redirect.INHERIT);
-                        }else{
+                        } else if (stdErrFile != null) {
+                            pb.redirectError(new File(stdErrFile));
+                            pb.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+                        } else{
                             pb.inheritIO();
                         }
 
