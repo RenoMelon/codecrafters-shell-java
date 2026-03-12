@@ -25,6 +25,7 @@ public class Main {
 
             if(command != null){
                 PrintStream originalOut = System.out;
+                PrintStream originalErr = System.err;
 
                 if(stdOutFile != null){
                     System.setOut(new PrintStream(new FileOutputStream(stdOutFile)));
@@ -35,6 +36,7 @@ public class Main {
 
                 command.execute(parts);
                 System.setOut(originalOut);
+                System.setErr(originalErr);
             }else{
 
                 try{
