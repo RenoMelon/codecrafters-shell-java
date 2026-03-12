@@ -32,7 +32,7 @@ public class Main {
                         sb.append("exec -a ");
                         sb.append(commandName.replace("'", "'\\''"));
                         sb.append(" ");
-                        sb.append(fullPath.get());
+                        sb.append(fullPath.get().replace("'", "'\\''"));
                         for(String arg : cmdArgs){
                             sb.append(" '");
                             sb.append(arg.replace("'", "'\\''"));
