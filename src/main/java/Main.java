@@ -1,4 +1,7 @@
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.*;
 
 public class Main {
@@ -13,14 +16,24 @@ public class Main {
 
             if(input.isEmpty()) continue;
 
-            String[] parts = Commands.inputTokenizer(input).toArray(new String[0]);
+            List<String> tokens = Commands.inputTokenizer(input);
+            String stdOutFile = Commands.parseRedirection(tokens);
+            String[] parts = tokens.toArray(new String[0]);
+
             String commandName = parts[0];
 
 
             Command command = Commands.get(commandName);
 
             if(command != null){
+                PrintStream originalOut = System.out;
+
+                if(stdOutFile != null){
+                    System.setOut(new PrintStream(new FileOutputStream(stdOutFile)));
+                }
+
                 command.execute(parts);
+                System.setOut(originalOut);
             }else{
 
                 try{
@@ -41,7 +54,13 @@ public class Main {
                         }
                         List<String> commandList = Arrays.asList("/bin/sh", "-c", sb.toString());
                         ProcessBuilder pb = new ProcessBuilder(commandList);
-                        pb.inheritIO();
+                        if(stdOutFile != null){
+                            pb.redirectOutput(new File(stdOutFile));
+                            pb.redirectError(ProcessBuilder.Redirect.INHERIT);
+                        }else{
+                            pb.inheritIO();
+                        }
+
                         Process process = pb.start();
                         process.waitFor();
 

@@ -81,6 +81,19 @@ public class Commands {
         return args;
     }
 
+    public static String parseRedirection(List<String> tokens){
+        String stdOutFile = null;
+        int i = tokens.indexOf(">");
+
+        if(i == -1) i = tokens.indexOf("1>");
+        if(i != -1){
+            stdOutFile = tokens.get(i + 1);
+            tokens.remove(i + 1);
+            tokens.remove(i);
+        }
+        return stdOutFile;
+    }
+
 }
 
 class Exit implements Command{
