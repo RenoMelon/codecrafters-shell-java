@@ -16,6 +16,8 @@ public class Main {
             List<String> tokens = Commands.inputTokenizer(input);
             Map<String, String> redirections = Commands.parseRedirection(tokens);
             String stdOutFile = redirections.get("stdout");
+            String stdOutAppendFile = redirections.get("stdoutAppend");
+            String stdErrAppendFile = redirections.get("stderrAppend");
             String stdErrFile = redirections.get("stderr");
             String[] parts = tokens.toArray(new String[0]);
 
@@ -31,9 +33,16 @@ public class Main {
                 if(stdOutFile != null){
                     System.setOut(new PrintStream(new FileOutputStream(stdOutFile)));
                 }
+                if(stdOutAppendFile != null){
+                    System.setOut(new PrintStream(new FileOutputStream(stdOutAppendFile, true)));
+                }
                 if(stdErrFile != null){
                     System.setErr(new PrintStream(new FileOutputStream(stdErrFile)));
                 }
+                if(stdErrAppendFile != null){
+                    System.setErr(new PrintStream(new FileOutputStream(stdErrAppendFile, true)));
+                }
+
 
                 command.execute(parts);
                 System.setOut(originalOut);
@@ -58,14 +67,18 @@ public class Main {
                         }
                         List<String> commandList = Arrays.asList("/bin/sh", "-c", sb.toString());
                         ProcessBuilder pb = new ProcessBuilder(commandList);
-                        if(stdOutFile != null){
+                        if (stdOutFile != null) {
                             pb.redirectOutput(new File(stdOutFile));
-                        }else{
+                        } else if (stdOutAppendFile != null) {
+                            pb.redirectOutput(ProcessBuilder.Redirect.appendTo(new File(stdOutAppendFile)));
+                        } else {
                             pb.redirectOutput(ProcessBuilder.Redirect.INHERIT);
                         }
                         if(stdErrFile != null){
                             pb.redirectError(new File(stdErrFile));
-                        }else{
+                        }else if(stdErrAppendFile != null){
+                            pb.redirectError(ProcessBuilder.Redirect.appendTo(new File(stdErrAppendFile)));
+                        } else{
                             pb.redirectError(ProcessBuilder.Redirect.INHERIT);
                         }
 

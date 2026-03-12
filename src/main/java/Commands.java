@@ -84,26 +84,44 @@ public class Commands {
     public static Map<String, String> parseRedirection(List<String> tokens){
         Map<String, String> redirectionMap = new HashMap<>();
         String stdOutFile = null;
+        String stdOutAppendFile = null;
         String stdErrFile = null;
+        String stdErrAppendFile = null;
 
         int i = tokens.indexOf(">");
         if(i == -1) i = tokens.indexOf("1>");
+        int ii = tokens.indexOf(">>");
+        if(ii == -1) ii = tokens.indexOf("1>>");
 
-        if(i != -1){
+        int j = tokens.indexOf("2>");
+        int jj = tokens.indexOf("2>>");
+
+
+        if(i != -1) {
             stdOutFile = tokens.get(i + 1);
             tokens.remove(i + 1);
             tokens.remove(i);
         }
-
-        int j = tokens.indexOf("2>");
-        if(j != -1){
+        if (ii != -1) {
+            stdOutAppendFile = tokens.get(ii + 1);
+            tokens.remove(ii + 1);
+            tokens.remove(ii);
+        }
+        if (j != -1) {
             stdErrFile = tokens.get(j + 1);
             tokens.remove(j + 1);
             tokens.remove(j);
         }
+        if (jj != -1) {
+            stdErrAppendFile = tokens.get(jj + 1);
+            tokens.remove(jj + 1);
+            tokens.remove(jj);
+        }
 
         redirectionMap.put("stdout", stdOutFile);
         redirectionMap.put("stderr", stdErrFile);
+        redirectionMap.put("stdoutAppend", stdOutAppendFile);
+        redirectionMap.put("stderrAppend", stdErrAppendFile);
 
         return redirectionMap;
 
