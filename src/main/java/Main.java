@@ -1,15 +1,25 @@
+import org.jline.reader.LineReader;
+import org.jline.reader.LineReaderBuilder;
+import org.jline.terminal.Terminal;
+import org.jline.terminal.TerminalBuilder;
+
 import java.io.*;
 import java.util.*;
 
 public class Main {
     public static void main(String[] args) throws Exception {
 
-        Scanner scanner = new Scanner(System.in);
+
+        Terminal terminal = TerminalBuilder.terminal();
+        LineReader reader = LineReaderBuilder.builder()
+                .terminal(terminal)
+                .completer(new ShellCompleter())
+                .build();
+
 
 
         while (true){
-            System.out.print("$ ");
-            String input = scanner.nextLine().trim();
+            String input = reader.readLine("$ ");
 
             if(input.isEmpty()) continue;
 

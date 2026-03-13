@@ -11,6 +11,7 @@ interface Command {
 public class Commands {
     private static final Map<String, Command> commands = new HashMap<>();
     public static Path currentWorkingDir = Paths.get(System.getProperty("user.dir"));
+    public static List<String> commandNames = new ArrayList<String>(Arrays.asList("echo","exit"));
 
     static {
         commands.put("exit", new Exit());
