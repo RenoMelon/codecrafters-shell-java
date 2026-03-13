@@ -9,9 +9,8 @@ interface Command {
 }
 
 public class Commands {
-    private static final Map<String, Command> commands = new HashMap<>();
+    public static final Map<String, Command> commands = new HashMap<>();
     public static Path currentWorkingDir = Paths.get(System.getProperty("user.dir"));
-    public static List<String> commandNames = new ArrayList<String>(Arrays.asList("echo","exit"));
 
     static {
         commands.put("exit", new Exit());
@@ -185,7 +184,7 @@ class Cd implements Command{
             System.out.println("cd: missing operand");
             return;
         }
-        //mss later nog zorgen voor subdir navigatie mogelijkheid met ~ (bv ~/Documents)
+        //mss later nog zorgen voor subdir navigatie mogelijkheid met ~ (bv ~/Documents) want dit is nu broken
         if(args[1].startsWith("~")){
             String home = System.getenv("HOME");
             if(home == null) home = System.getProperty("user.home");

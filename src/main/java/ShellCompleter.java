@@ -10,10 +10,8 @@ public class ShellCompleter implements Completer {
     public void complete(LineReader lineReader, ParsedLine parsedLine, List<Candidate> candidates) {
         String word = parsedLine.word();
 
-        Commands.commandNames.forEach(name -> {
-            if(name.startsWith(word)){
-                candidates.add(new Candidate(name));
-            }
+        Commands.commands.keySet().forEach(name -> {
+            if(name.startsWith(word)) candidates.add(new Candidate(name));
         });
     }
 }
