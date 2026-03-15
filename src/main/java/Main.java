@@ -44,6 +44,8 @@ public class Main {
                 return true;
             }
 
+            terminal.writer().print("\007");
+            terminal.writer().flush();
             lastWasTab[0] = false;
             return true;
         }, "\t");
