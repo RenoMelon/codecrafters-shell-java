@@ -39,6 +39,7 @@ public class Main {
                     terminal.writer().println("\n" + String.join("  ", matches));
                     terminal.writer().flush();
                     lastWasTab[0] = false;
+                    reader.callWidget(LineReader.REDRAW_LINE);
                 }
                 return true;
             }
