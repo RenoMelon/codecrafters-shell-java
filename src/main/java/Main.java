@@ -1,5 +1,6 @@
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
+import org.jline.reader.Widget;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 
@@ -13,9 +14,38 @@ public class Main {
         Terminal terminal = TerminalBuilder.terminal();
         LineReader reader = LineReaderBuilder.builder()
                 .terminal(terminal)
-                .completer(new ShellCompleter())
                 .option(LineReader.Option.DISABLE_EVENT_EXPANSION, true)
                 .build();
+
+        boolean[] lastWasTab = {false};
+
+        reader.getKeyMaps().get(LineReader.MAIN).bind((Widget) () -> {
+            String buffer = reader.getBuffer().toString();
+            List<String> matches = ShellCompleter.getMatches(buffer);
+
+            if (matches.size() == 1) {
+                reader.getBuffer().clear();
+                reader.getBuffer().write(matches.get(0) + " ");
+                lastWasTab[0] = false;
+                return true;
+            }
+
+            if (matches.size() > 1) {
+                if (!lastWasTab[0]) {
+                    terminal.writer().print("\007"); // bell
+                    terminal.writer().flush();
+                    lastWasTab[0] = true;
+                } else {
+                    terminal.writer().println("\n" + String.join("  ", matches));
+                    terminal.writer().flush();
+                    lastWasTab[0] = false;
+                }
+                return true;
+            }
+
+            lastWasTab[0] = false;
+            return true;
+        }, "\t");
 
 
 
