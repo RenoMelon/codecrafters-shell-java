@@ -23,31 +23,40 @@ public class Main {
             String buffer = reader.getBuffer().toString();
             List<String> matches = ShellCompleter.getMatches(buffer);
 
+            if(matches.isEmpty()){
+                terminal.writer().print("\007"); // bell
+                terminal.writer().flush();
+                lastWasTab[0] = true;
+                return true;
+            }
+
             if (matches.size() == 1) {
                 reader.getBuffer().clear();
                 reader.getBuffer().write(matches.get(0) + " ");
                 lastWasTab[0] = false;
                 return true;
             }
+            String lcp = ShellCompleter.longestCommonPrefix(matches);
 
-            if (matches.size() > 1) {
-                if (!lastWasTab[0]) {
-                    terminal.writer().print("\007"); // bell
-                    terminal.writer().flush();
-                    lastWasTab[0] = true;
-                } else {
-                    terminal.writer().println("\n" + String.join("  ", matches));
-                    terminal.writer().flush();
-                    lastWasTab[0] = false;
-                    reader.callWidget(LineReader.REDRAW_LINE);
-                }
+            if(lcp.length() > buffer.length()){
+                reader.getBuffer().clear();
+                reader.getBuffer().write(lcp);
+                lastWasTab[0] = false;
                 return true;
             }
 
-            terminal.writer().print("\007");
-            terminal.writer().flush();
-            lastWasTab[0] = false;
+            if (!lastWasTab[0]) {
+                terminal.writer().print("\007"); // bell
+                terminal.writer().flush();
+                lastWasTab[0] = true;
+            } else {
+                terminal.writer().println("\n" + String.join("  ", matches));
+                terminal.writer().flush();
+                lastWasTab[0] = false;
+                reader.callWidget(LineReader.REDRAW_LINE);
+            }
             return true;
+
         }, "\t");
 
 

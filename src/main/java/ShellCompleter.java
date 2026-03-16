@@ -27,5 +27,16 @@ public class ShellCompleter {
         }
         return new ArrayList<>(matches);
     }
+
+    public static String longestCommonPrefix(List<String> matches){
+        if(matches.isEmpty()) return "";
+        String prefix = matches.get(0);
+        for (int i = 1; i < matches.size(); i++){
+            while(!matches.get(i).startsWith(prefix)){
+                prefix = prefix.substring(0, prefix.length() - 1);
+            }
+        }
+        return prefix;
+    }
 }
 
