@@ -6,6 +6,7 @@ import org.jline.terminal.TerminalBuilder;
 
 import java.io.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Main {
     public static void main(String[] args) throws Exception {
@@ -79,11 +80,15 @@ public class Main {
                 return true;
             }
 
-            String lcp = ShellCompleter.longestCommonPrefix(filenameMatches);
+            List<String> strippedMatches = filenameMatches.stream()
+                    .map(m -> m.endsWith("/") ? m.substring(0, m.length() - 1) : m)
+                    .collect(Collectors.toList());
+            String lcp = ShellCompleter.longestCommonPrefix(strippedMatches);
 
-            if(lcp.length() > buffer.length()){
+            String filePrefix = buffer.substring(buffer.lastIndexOf(" ") + 1);
+            if(lcp.length() > filePrefix.length()){
                 reader.getBuffer().clear();
-                reader.getBuffer().write(lcp);
+                reader.getBuffer().write(beforePrefix + lcp);
                 lastWasTab[0] = false;
                 return true;
             }
