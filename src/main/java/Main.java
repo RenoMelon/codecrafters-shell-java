@@ -93,7 +93,11 @@ public class Main {
                 terminal.writer().flush();
                 lastWasTab[0] = true;
             } else {
-                filenameMatches.replaceAll(match -> match.contains("/") ? match.substring(match.lastIndexOf("/") + 1 ): match);
+                filenameMatches.replaceAll(match -> {
+                    String withoutTrailing = match.endsWith("/") ? match.substring(0, match.length() - 1) : match;
+                    int lastSlash = withoutTrailing.lastIndexOf("/");
+                    return lastSlash >= 0 ? match.substring(lastSlash + 1) : match;
+                });
                 terminal.writer().println("\n" + String.join("  ", filenameMatches));
                 terminal.writer().flush();
                 lastWasTab[0] = false;
