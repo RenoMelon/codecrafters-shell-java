@@ -79,11 +79,31 @@ public class Main {
                 return true;
             }
 
+            String lcp = ShellCompleter.longestCommonPrefix(filenameMatches);
+
+            if(lcp.length() > buffer.length()){
+                reader.getBuffer().clear();
+                reader.getBuffer().write(lcp);
+                lastWasTab[0] = false;
+                return true;
+            }
+
+            if (!lastWasTab[0]) {
+                terminal.writer().print("\007"); // bell
+                terminal.writer().flush();
+                lastWasTab[0] = true;
+            } else {
+                filenameMatches.replaceAll(match -> match.contains("/") ? match.substring(match.lastIndexOf("/") + 1 ): match);
+                terminal.writer().println("\n" + String.join("  ", filenameMatches));
+                terminal.writer().flush();
+                lastWasTab[0] = false;
+                reader.callWidget(LineReader.REDRAW_LINE);
+            }
+
         }
 
             return true;
         }, "\t");
-
 
 
 
