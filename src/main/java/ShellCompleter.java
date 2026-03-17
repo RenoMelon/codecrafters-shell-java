@@ -40,11 +40,21 @@ public class ShellCompleter {
     public static List<String> getFileMatches(String prefix){
         // zoek in currentWorkingDir naar files die beginnen met de prefix
         List<String> fileMatches = new ArrayList<>();
-        File folder = new File(String.valueOf(Commands.currentWorkingDir));
+        File folder;
+        String filePrefix = prefix;
+        String subDirectory = "";
+        if(prefix.contains("/")){
+            subDirectory = prefix.substring(0, prefix.lastIndexOf("/") + 1);
+            filePrefix = prefix.substring(prefix.lastIndexOf("/") + 1);
+            folder = new File(String.valueOf(Commands.currentWorkingDir) + subDirectory);
+        }else{
+            folder = new File(String.valueOf(Commands.currentWorkingDir));
+        }
+
         if(!folder.exists() || !folder.isDirectory()) return List.of();
         for(File file : folder.listFiles()){
-            if(file.getName().startsWith(prefix)){
-                fileMatches.add(file.getName());
+            if(file.getName().startsWith(filePrefix)){
+                fileMatches.add(subDirectory + file.getName());
             }
         }
         Collections.sort(fileMatches);
