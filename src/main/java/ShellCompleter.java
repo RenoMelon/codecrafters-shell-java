@@ -46,7 +46,7 @@ public class ShellCompleter {
         if(prefix.contains("/")){
             subDirectory = prefix.substring(0, prefix.lastIndexOf("/") + 1);
             filePrefix = prefix.substring(prefix.lastIndexOf("/") + 1);
-            folder = new File(String.valueOf(Commands.currentWorkingDir) + subDirectory);
+            folder = Commands.currentWorkingDir.resolve(subDirectory).toFile();
         }else{
             folder = new File(String.valueOf(Commands.currentWorkingDir));
         }
