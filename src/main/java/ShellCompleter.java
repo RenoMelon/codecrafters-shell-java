@@ -53,8 +53,10 @@ public class ShellCompleter {
 
         if(!folder.exists() || !folder.isDirectory()) return List.of();
         for(File file : folder.listFiles()){
-            if(file.getName().startsWith(filePrefix)){
-                fileMatches.add(subDirectory + file.getName());
+            String name = file.getName();
+            if(file.isDirectory()) name += "/";
+            if(name.startsWith(filePrefix)){
+                fileMatches.add(subDirectory + name);
             }
         }
         Collections.sort(fileMatches);

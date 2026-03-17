@@ -73,7 +73,9 @@ public class Main {
             }
             if(filenameMatches.size() == 1){
                 reader.getBuffer().clear();
-                reader.getBuffer().write(beforePrefix + filenameMatches.getFirst() + " ");
+                String match = filenameMatches.getFirst();
+                String suffix = match.endsWith("/") ? "" : " ";
+                reader.getBuffer().write(beforePrefix + match + suffix);
                 return true;
             }
 
