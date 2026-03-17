@@ -20,9 +20,15 @@ public class Main {
         boolean[] lastWasTab = {false};
 
         reader.getKeyMaps().get(LineReader.MAIN).bind((Widget) () -> {
-            String buffer = reader.getBuffer().toString();
-            List<String> matches = ShellCompleter.getMatches(buffer);
 
+            String buffer = reader.getBuffer().toString();
+            boolean commandCompletionState = !buffer.contains(" ");
+            boolean filenameCompletionState = buffer.contains(" ");
+
+
+
+        if(commandCompletionState){
+            List<String> matches = ShellCompleter.getMatches(buffer);
             if(matches.isEmpty()){
                 terminal.writer().print("\007"); // bell
                 terminal.writer().flush();
@@ -56,13 +62,31 @@ public class Main {
                 reader.callWidget(LineReader.REDRAW_LINE);
             }
             return true;
+        }
+        if(filenameCompletionState){
+            String beforePrefix = buffer.substring(0, buffer.lastIndexOf(" ") + 1);
+            List<String> filenameMatches = ShellCompleter.getFileMatches(buffer.substring(buffer.lastIndexOf(" ") + 1));
+            if(filenameMatches.isEmpty()){
+                terminal.writer().print("\007");
+                terminal.writer().flush();
+                return true;
+            }
+            if(filenameMatches.size() == 1){
+                reader.getBuffer().clear();
+                reader.getBuffer().write(beforePrefix + filenameMatches.getFirst() + " ");
+                return true;
+            }
 
+        }
+
+            return true;
         }, "\t");
 
 
 
 
         while (true){
+            //Builtins sectie
             String input = reader.readLine("$ ");
 
             if(input.isEmpty()) continue;
@@ -102,7 +126,7 @@ public class Main {
                 System.setOut(originalOut);
                 System.setErr(originalErr);
             }else{
-
+            // Executables sectie
                 try{
                     Optional<String> fullPath = Commands.pathResolver(commandName);
                     if(fullPath.isPresent()){

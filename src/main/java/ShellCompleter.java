@@ -1,8 +1,6 @@
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.nio.file.Path;
+import java.util.*;
 
 public class ShellCompleter {
     public static List<String> getMatches(String prefix) {
@@ -38,5 +36,31 @@ public class ShellCompleter {
         }
         return prefix;
     }
+
+    public static List<String> getFileMatches(String prefix){
+        // zoek in currentWorkingDir naar files die beginnen met de prefix
+        List<String> fileMatches = new ArrayList<>();
+        File folder = new File(String.valueOf(Commands.currentWorkingDir));
+        if(!folder.exists() || !folder.isDirectory()) return List.of();
+        for(File file : folder.listFiles()){
+            if(file.getName().startsWith(prefix)){
+                fileMatches.add(file.getName());
+            }
+        }
+        Collections.sort(fileMatches);
+        return fileMatches;
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
