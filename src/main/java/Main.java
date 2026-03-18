@@ -108,7 +108,7 @@ public class Main {
                 lastWasTab[0] = false;
                 reader.callWidget(LineReader.REDRAW_LINE);
             }
-
+//
         }
 
             return true;
