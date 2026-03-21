@@ -116,12 +116,7 @@ public class Main {
 
 
 
-        while (true){
-            //Builtins sectie
-            String input = reader.readLine("$ ");
 
-            if(input.isEmpty()) continue;
-            Commands.commandHistory.add(input);
 
             List<String> tokens = Commands.inputTokenizer(input);
             Map<String, String> redirections = Commands.parseRedirection(tokens);

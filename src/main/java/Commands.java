@@ -210,10 +210,23 @@ class History implements Command{
 
     public void execute(String[] args) {
         // Should list previously executed commands
-
-        for(int i = 0; i < Commands.commandHistory.size(); i++){
-            System.out.println(i + 1 + "  " + Commands.commandHistory.get(i));
+        int n = 0;
+        if(args.length > 1 && !args[1].isEmpty()){
+            n = Integer.parseInt(args[1]);
         }
+        if(n != 0){
+            int startIndex = Commands.commandHistory.size() - n;
+            for(int i = startIndex; i < Commands.commandHistory.size(); i++){
+                System.out.println(i + 1 + "  " + Commands.commandHistory.get(i));
+                n--;
+            }
+        }else{
+            for(int i = 0; i < Commands.commandHistory.size(); i++){
+                System.out.printf("%4d  %s%n", i + 1, Commands.commandHistory.get(i));
+
+            }
+        }
+
 
     }
 }
