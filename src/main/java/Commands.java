@@ -1,4 +1,5 @@
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -220,7 +221,18 @@ class History implements Command{
                 System.out.println(i + 1 + "  " + Commands.commandHistory.get(i));
                 n--;
             }
-        }else{
+        } else if (args.length > 1 && args[1].equals("-r")) {
+            // lees bestand op args[2]
+            // voeg elke niet-lege lijn toe aan commandHistory
+            try {
+                Path pathToHistoryFile = Paths.get(args[2]);
+                Commands.commandHistory.addAll(Files.readAllLines(pathToHistoryFile));
+            } catch (IOException e) {
+                System.out.println("failed to execute");
+            }
+
+
+        } else{
             for(int i = 0; i < Commands.commandHistory.size(); i++){
                 System.out.printf("%4d  %s%n", i + 1, Commands.commandHistory.get(i));
 
