@@ -4,6 +4,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
 
 interface Command {
     void execute(String[] args);
@@ -212,30 +213,28 @@ class History implements Command{
     public void execute(String[] args) {
         // Should list previously executed commands
         int n = 0;
-        if(args.length > 1 && !args[1].isEmpty()){
-            n = Integer.parseInt(args[1]);
-        }
-        if(n != 0){
-            int startIndex = Commands.commandHistory.size() - n;
-            for(int i = startIndex; i < Commands.commandHistory.size(); i++){
-                System.out.println(i + 1 + "  " + Commands.commandHistory.get(i));
-                n--;
-            }
-        } else if (args.length > 1 && args[1].equals("-r")) {
-            // lees bestand op args[2]
-            // voeg elke niet-lege lijn toe aan commandHistory
+
+         if (args.length > 1 && args[1].equals("-r")) {
             try {
                 Path pathToHistoryFile = Paths.get(args[2]);
-                Commands.commandHistory.addAll(Files.readAllLines(pathToHistoryFile));
+                Commands.commandHistory.addAll(Files.readAllLines(pathToHistoryFile).stream().filter(l -> !l.isBlank()).collect(Collectors.toSet()));
             } catch (IOException e) {
                 System.out.println("failed to execute");
             }
 
 
+        } else if(args.length > 1 && !args[1].isEmpty()){
+            n = Integer.parseInt(args[1]);
+             if(n != 0){
+                 int startIndex = Commands.commandHistory.size() - n;
+                 for(int i = startIndex; i < Commands.commandHistory.size(); i++){
+                     System.out.println(i + 1 + "  " + Commands.commandHistory.get(i));
+                     n--;
+                 }
+        }
         } else{
             for(int i = 0; i < Commands.commandHistory.size(); i++){
                 System.out.printf("%4d  %s%n", i + 1, Commands.commandHistory.get(i));
-
             }
         }
 
