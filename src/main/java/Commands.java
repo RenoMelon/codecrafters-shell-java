@@ -11,6 +11,7 @@ interface Command {
 public class Commands {
     public static final Map<String, Command> commands = new HashMap<>();
     public static Path currentWorkingDir = Paths.get(System.getProperty("user.dir"));
+    public static List<String> commandHistory = new ArrayList<>();
 
     static {
         commands.put("exit", new Exit());
@@ -18,6 +19,7 @@ public class Commands {
         commands.put("type", new Type());
         commands.put("pwd", new Pwd());
         commands.put("cd", new Cd());
+        commands.put("history", new History());
     }
 
     public static Command get(String name){
@@ -199,6 +201,18 @@ class Cd implements Command{
             Commands.currentWorkingDir = requestedPath.normalize();
         } else {
             System.out.println("cd: " + args[1] + ": " + "No such file or directory");
+        }
+
+    }
+}
+
+class History implements Command{
+
+    public void execute(String[] args) {
+        // Should list previously executed commands
+
+        for(int i = 0; i < Commands.commandHistory.size(); i++){
+            System.out.println(i + 1 + "  " + Commands.commandHistory.get(i));
         }
 
     }

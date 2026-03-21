@@ -108,7 +108,7 @@ public class Main {
                 lastWasTab[0] = false;
                 reader.callWidget(LineReader.REDRAW_LINE);
             }
-//kk
+
         }
 
             return true;
@@ -121,6 +121,7 @@ public class Main {
             String input = reader.readLine("$ ");
 
             if(input.isEmpty()) continue;
+            Commands.commandHistory.add(input);
 
             List<String> tokens = Commands.inputTokenizer(input);
             Map<String, String> redirections = Commands.parseRedirection(tokens);
@@ -190,7 +191,6 @@ public class Main {
                         } else{
                             pb.redirectError(ProcessBuilder.Redirect.INHERIT);
                         }
-
                         Process process = pb.start();
                         process.waitFor();
 
