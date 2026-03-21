@@ -217,18 +217,17 @@ class History implements Command{
          if (args.length > 1 && args[1].equals("-r")) {
             try {
                 Path pathToHistoryFile = Paths.get(args[2]);
-                Commands.commandHistory.addAll(Files.readAllLines(pathToHistoryFile).stream().filter(l -> !l.isBlank()).collect(Collectors.toSet()));
+                Commands.commandHistory.addAll(Files.readAllLines(pathToHistoryFile).stream().filter(l -> !l.isBlank()).toList());
             } catch (IOException e) {
                 System.out.println("failed to execute");
             }
-
 
         } else if(args.length > 1 && !args[1].isEmpty()){
             n = Integer.parseInt(args[1]);
              if(n != 0){
                  int startIndex = Commands.commandHistory.size() - n;
                  for(int i = startIndex; i < Commands.commandHistory.size(); i++){
-                     System.out.println(i + 1 + "  " + Commands.commandHistory.get(i));
+                     System.out.printf("%4d  %s%n", i + 1, Commands.commandHistory.get(i));
                      n--;
                  }
         }
