@@ -232,9 +232,33 @@ public class Main {
     }
 
     private static void executePipeline(List<String> segments) throws IOException, InterruptedException {
+        boolean allExternal = segments.stream().allMatch(s -> {
+            List<String> t = Commands.inputTokenizer(s);
+            return !t.isEmpty() && Commands.get(t.get(0)) == null;
+        });
+
+        if (allExternal) {
+            List<ProcessBuilder> builders = new ArrayList<>();
+            for (String segment : segments) {
+                List<String> tokens = Commands.inputTokenizer(segment);
+                if (tokens.isEmpty()) continue;
+                Optional<String> fp = Commands.pathResolver(tokens.get(0));
+                if (fp.isPresent()) tokens.set(0, fp.get());
+                ProcessBuilder pb = new ProcessBuilder(tokens);
+                pb.redirectError(ProcessBuilder.Redirect.INHERIT);
+                builders.add(pb);
+            }
+            builders.get(0).redirectInput(ProcessBuilder.Redirect.INHERIT);
+            builders.get(builders.size() - 1).redirectOutput(ProcessBuilder.Redirect.INHERIT);
+            List<Process> processes = ProcessBuilder.startPipeline(builders);
+            for (Process p : processes) p.waitFor();
+            return;
+        }
+
+        // Hybride pad: minstens één builtin aanwezig
         List<Thread> threads = new ArrayList<>();
         List<Process> processes = new ArrayList<>();
-        InputStream currentStdin = null; // null = terminal
+        InputStream currentStdin = null;
 
         for (int i = 0; i < segments.size(); i++) {
             boolean isLast = (i == segments.size() - 1);
@@ -246,7 +270,6 @@ public class Main {
             final InputStream segStdin = currentStdin;
 
             if (builtin != null) {
-                // Builtin → draait in een thread
                 PipedOutputStream writeEnd = null;
                 PipedInputStream readEnd = null;
                 if (!isLast) {
@@ -274,7 +297,6 @@ public class Main {
                 currentStdin = readEnd;
 
             } else {
-                // Extern commando → ProcessBuilder
                 Optional<String> fullPath = Commands.pathResolver(cmdName);
                 List<String> cmd = new ArrayList<>(tokens);
                 if (fullPath.isPresent()) cmd.set(0, fullPath.get());
@@ -287,7 +309,6 @@ public class Main {
                 Process p = pb.start();
                 processes.add(p);
 
-                // Als er een vorige stream is, feed die naar process stdin in een aparte thread
                 if (segStdin != null) {
                     final InputStream feed = segStdin;
                     final OutputStream sink = p.getOutputStream();
@@ -305,6 +326,7 @@ public class Main {
         for (Thread t : threads) t.join();
         for (Process p : processes) p.waitFor();
     }
+
 
 
 }
