@@ -1,3 +1,4 @@
+import org.jline.reader.History;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
 import org.jline.reader.Widget;
@@ -5,6 +6,8 @@ import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -12,11 +15,9 @@ import java.util.stream.Collectors;
 public class Main {
     public static void main(String[] args) throws Exception {
 
-
         Terminal terminal = TerminalBuilder.terminal();
         LineReader reader = LineReaderBuilder.builder()
                 .terminal(terminal)
-                .variable(LineReader.HISTORY_FILE, Paths.get(System.getenv("HISTFILE")))
                 .option(LineReader.Option.DISABLE_EVENT_EXPANSION, true)
                 .build();
 
@@ -116,6 +117,19 @@ public class Main {
             return true;
         }, "\t");
 
+        String histFile = System.getenv("HISTFILE");
+        if(histFile != null && !histFile.isEmpty()){
+            try {
+                Path histPath = Paths.get(histFile);
+                if(Files.exists(histPath)){
+                    Files.readAllLines(histPath).stream()
+                            .filter(l -> !l.isBlank())
+                            .forEach(Commands.commandHistory::add);
+                }
+            } catch (IOException e) {
+                System.out.println(e.getMessage());
+            }
+        }
 
 
         while (true){
