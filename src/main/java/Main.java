@@ -139,6 +139,12 @@ public class Main {
             if(input.isEmpty()) continue;
             Commands.commandHistory.add(input);
 
+            if (input.contains("|")) {
+                List<String> segments = Commands.splitOnPipe(input);
+                executePipeline(segments);
+                continue;
+            }
+
             List<String> tokens = Commands.inputTokenizer(input);
             Map<String, String> redirections = Commands.parseRedirection(tokens);
             String stdOutFile = redirections.get("stdout");
@@ -224,4 +230,31 @@ public class Main {
         }
 
     }
+
+    private static void executePipeline(List<String> segments) throws IOException, InterruptedException {
+        List<ProcessBuilder> builders = new ArrayList<>();
+
+        for (String segment : segments) {
+            List<String> tokens = Commands.inputTokenizer(segment);
+            if (tokens.isEmpty()) continue;
+
+            String cmd = tokens.get(0);
+            Optional<String> fullPath = Commands.pathResolver(cmd);
+            if (fullPath.isPresent()) tokens.set(0, fullPath.get());
+
+            builders.add(new ProcessBuilder(tokens));
+        }
+
+        if (builders.isEmpty()) return;
+
+        // Eerste process leest van terminal, laatste schrijft naar terminal
+        builders.get(0).redirectInput(ProcessBuilder.Redirect.INHERIT);
+        builders.get(builders.size() - 1).redirectOutput(ProcessBuilder.Redirect.INHERIT);
+        // stderr van alle processes naar terminal
+        builders.forEach(pb -> pb.redirectError(ProcessBuilder.Redirect.INHERIT));
+
+        List<Process> processes = ProcessBuilder.startPipeline(builders);
+        for (Process p : processes) p.waitFor();
+    }
+
 }

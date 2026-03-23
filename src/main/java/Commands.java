@@ -133,6 +133,26 @@ public class Commands {
 
     }
 
+    public static List<String> splitOnPipe(String input) {
+        List<String> segments = new ArrayList<>();
+        StringBuilder current = new StringBuilder();
+        boolean inSingle = false, inDouble = false;
+
+        for (char c : input.toCharArray()) {
+            if (c == '\'' && !inDouble) inSingle = !inSingle;
+            else if (c == '"' && !inSingle) inDouble = !inDouble;
+            else if (c == '|' && !inSingle && !inDouble) {
+                segments.add(current.toString().trim());
+                current = new StringBuilder();
+                continue;
+            }
+            current.append(c);
+        }
+        segments.add(current.toString().trim());
+        return segments;
+    }
+
+
 }
 
 class Exit implements Command{
