@@ -232,29 +232,79 @@ public class Main {
     }
 
     private static void executePipeline(List<String> segments) throws IOException, InterruptedException {
-        List<ProcessBuilder> builders = new ArrayList<>();
+        List<Thread> threads = new ArrayList<>();
+        List<Process> processes = new ArrayList<>();
+        InputStream currentStdin = null; // null = terminal
 
-        for (String segment : segments) {
-            List<String> tokens = Commands.inputTokenizer(segment);
+        for (int i = 0; i < segments.size(); i++) {
+            boolean isLast = (i == segments.size() - 1);
+            List<String> tokens = Commands.inputTokenizer(segments.get(i));
             if (tokens.isEmpty()) continue;
 
-            String cmd = tokens.get(0);
-            Optional<String> fullPath = Commands.pathResolver(cmd);
-            if (fullPath.isPresent()) tokens.set(0, fullPath.get());
+            String cmdName = tokens.get(0);
+            Command builtin = Commands.get(cmdName);
+            final InputStream segStdin = currentStdin;
 
-            builders.add(new ProcessBuilder(tokens));
+            if (builtin != null) {
+                // Builtin → draait in een thread
+                PipedOutputStream writeEnd = null;
+                PipedInputStream readEnd = null;
+                if (!isLast) {
+                    writeEnd = new PipedOutputStream();
+                    readEnd = new PipedInputStream(writeEnd);
+                }
+                final String[] cmdArgs = tokens.toArray(new String[0]);
+                final PipedOutputStream outPipe = writeEnd;
+
+                Thread t = new Thread(() -> {
+                    PrintStream savedOut = System.out;
+                    InputStream savedIn = System.in;
+                    try {
+                        if (segStdin != null) System.setIn(segStdin);
+                        if (outPipe != null) System.setOut(new PrintStream(outPipe, true));
+                        builtin.execute(cmdArgs);
+                    } finally {
+                        System.setOut(savedOut);
+                        System.setIn(savedIn);
+                        try { if (outPipe != null) outPipe.close(); } catch (IOException e) {}
+                    }
+                });
+                threads.add(t);
+                t.start();
+                currentStdin = readEnd;
+
+            } else {
+                // Extern commando → ProcessBuilder
+                Optional<String> fullPath = Commands.pathResolver(cmdName);
+                List<String> cmd = new ArrayList<>(tokens);
+                if (fullPath.isPresent()) cmd.set(0, fullPath.get());
+
+                ProcessBuilder pb = new ProcessBuilder(cmd);
+                pb.redirectError(ProcessBuilder.Redirect.INHERIT);
+                pb.redirectInput(segStdin == null ? ProcessBuilder.Redirect.INHERIT : ProcessBuilder.Redirect.PIPE);
+                pb.redirectOutput(isLast ? ProcessBuilder.Redirect.INHERIT : ProcessBuilder.Redirect.PIPE);
+
+                Process p = pb.start();
+                processes.add(p);
+
+                // Als er een vorige stream is, feed die naar process stdin in een aparte thread
+                if (segStdin != null) {
+                    final InputStream feed = segStdin;
+                    final OutputStream sink = p.getOutputStream();
+                    Thread feeder = new Thread(() -> {
+                        try { feed.transferTo(sink); sink.close(); }
+                        catch (IOException e) {}
+                    });
+                    feeder.start();
+                    threads.add(feeder);
+                }
+                currentStdin = isLast ? null : p.getInputStream();
+            }
         }
 
-        if (builders.isEmpty()) return;
-
-        // Eerste process leest van terminal, laatste schrijft naar terminal
-        builders.get(0).redirectInput(ProcessBuilder.Redirect.INHERIT);
-        builders.get(builders.size() - 1).redirectOutput(ProcessBuilder.Redirect.INHERIT);
-        // stderr van alle processes naar terminal
-        builders.forEach(pb -> pb.redirectError(ProcessBuilder.Redirect.INHERIT));
-
-        List<Process> processes = ProcessBuilder.startPipeline(builders);
+        for (Thread t : threads) t.join();
         for (Process p : processes) p.waitFor();
     }
+
 
 }
