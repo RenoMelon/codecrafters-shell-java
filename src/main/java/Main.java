@@ -5,6 +5,7 @@ import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 
 import java.io.*;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -15,6 +16,7 @@ public class Main {
         Terminal terminal = TerminalBuilder.terminal();
         LineReader reader = LineReaderBuilder.builder()
                 .terminal(terminal)
+                .variable(LineReader.HISTORY_FILE, Paths.get(System.getenv("HISTFILE")))
                 .option(LineReader.Option.DISABLE_EVENT_EXPANSION, true)
                 .build();
 
