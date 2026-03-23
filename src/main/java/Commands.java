@@ -229,7 +229,7 @@ class History implements Command{
                  for(int i = startIndex; i < Commands.commandHistory.size(); i++){
                      System.out.printf("%4d  %s%n", i + 1, Commands.commandHistory.get(i));
                      n--;
-                 }
+                 }//
         }
         } else{
             for(int i = 0; i < Commands.commandHistory.size(); i++){
