@@ -126,6 +126,7 @@ public class Main {
                             .filter(l -> !l.isBlank())
                             .forEach(Commands.commandHistory::add);
                 }
+                reader.variable(LineReader.HISTORY_FILE, Paths.get(System.getenv("HISTFILE")));
             } catch (IOException e) {
                 System.out.println(e.getMessage());
             }
