@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -219,18 +220,27 @@ class History implements Command{
                 Path pathToHistoryFile = Paths.get(args[2]);
                 Commands.commandHistory.addAll(Files.readAllLines(pathToHistoryFile).stream().filter(l -> !l.isBlank()).toList());
             } catch (IOException e) {
-                System.out.println("failed to execute");
+                System.out.println(e.getMessage());
             }
 
-        } else if(args.length > 1 && !args[1].isEmpty()){
+        } else if (args.length > 1 && args[1].equals("-w")) {
+             try {
+                 Path pathToHistoryFile = Paths.get(args[2]);
+                 Files.write(pathToHistoryFile, Commands.commandHistory, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING); // Dit zijn eigenlijk de standard options, maar voor edu-purposes laat ik ze staan
+             } catch (IOException e) {
+                 System.out.println(e.getMessage());
+             }
+
+
+         } else if(args.length > 1 && !args[1].isEmpty()){
             n = Integer.parseInt(args[1]);
              if(n != 0){
                  int startIndex = Commands.commandHistory.size() - n;
                  for(int i = startIndex; i < Commands.commandHistory.size(); i++){
                      System.out.printf("%4d  %s%n", i + 1, Commands.commandHistory.get(i));
                      n--;
-                 }//
-        }
+                 }
+             }
         } else{
             for(int i = 0; i < Commands.commandHistory.size(); i++){
                 System.out.printf("%4d  %s%n", i + 1, Commands.commandHistory.get(i));
