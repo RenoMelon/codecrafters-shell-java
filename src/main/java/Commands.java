@@ -15,6 +15,7 @@ public class Commands {
     public static final Map<String, Command> commands = new HashMap<>();
     public static Path currentWorkingDir = Paths.get(System.getProperty("user.dir"));
     public static List<String> commandHistory = new ArrayList<>();
+    public static int lastWrittenHistoryIndex = 0;
 
     static {
         commands.put("exit", new Exit());
@@ -231,6 +232,18 @@ class History implements Command{
                  System.out.println(e.getMessage());
              }
 
+         } else if (args.length > 1 && args[1].equals("-a")) {
+             try {
+                 Path pathToHistoryFile = Paths.get(args[2]);
+                 List<String> newCommands = Commands.commandHistory.subList(
+                         Commands.lastWrittenHistoryIndex,
+                         Commands.commandHistory.size()
+                 );
+                 Files.write(pathToHistoryFile, newCommands, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+                 Commands.lastWrittenHistoryIndex = Commands.commandHistory.size();
+             } catch (IOException e) {
+                 System.out.println(e.getMessage());
+             }
 
          } else if(args.length > 1 && !args[1].isEmpty()){
             n = Integer.parseInt(args[1]);
