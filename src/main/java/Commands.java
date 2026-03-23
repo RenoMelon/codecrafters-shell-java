@@ -139,15 +139,16 @@ class Exit implements Command{
 
     public void execute(String[] args) {
 
-        try {
-            Path pathToHistoryFile = Paths.get(System.getenv("HISTFILE"));
-            Files.write(pathToHistoryFile, Commands.commandHistory, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
-
-            if(args.length > 1) System.exit(Integer.parseInt(args[1]));
-            else System.exit(0);
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
+        String histFile = System.getenv("HISTFILE");
+        if(histFile != null && !histFile.isEmpty()){
+            try {
+                Files.write(Paths.get(histFile), Commands.commandHistory, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+            } catch (IOException e) {
+                System.out.println(e.getMessage());
+            }
         }
+        if(args.length > 1) System.exit(Integer.parseInt(args[1]));
+        else System.exit(0);
 
     }
 }
