@@ -24,6 +24,8 @@ public class Commands {
         commands.put("pwd", new Pwd());
         commands.put("cd", new Cd());
         commands.put("history", new History());
+        commands.put("cat", new Cat());
+
     }
 
     public static Command get(String name){
@@ -226,6 +228,7 @@ class Cd implements Command{
             if(home == null) home = System.getProperty("user.home");
             Path homeDir = Paths.get(home);
             Commands.currentWorkingDir = homeDir.normalize();
+            System.setProperty("user.dir", Commands.currentWorkingDir.toString());
             return;
         }
 
@@ -233,6 +236,7 @@ class Cd implements Command{
 
         if(Files.isDirectory(requestedPath)){
             Commands.currentWorkingDir = requestedPath.normalize();
+            System.setProperty("user.dir", Commands.currentWorkingDir.toString());
         } else {
             System.out.println("cd: " + args[1] + ": " + "No such file or directory");
         }
@@ -293,3 +297,25 @@ class History implements Command{
 
     }
 }
+
+class Cat implements Command {
+    public void execute(String[] args) {
+        if (args.length < 2) {
+            System.out.println("cat: missing operand");
+            return;
+        }
+        for (int i = 1; i < args.length; i++) {
+            Path file = Commands.currentWorkingDir.resolve(args[i]);
+            if (!Files.exists(file)) {
+                System.err.println("cat: " + args[i] + ": No such file or directory");
+                continue;
+            }
+            try {
+                Files.lines(file).forEach(System.out::println);
+            } catch (IOException e) {
+                System.err.println("cat: " + args[i] + ": " + e.getMessage());
+            }
+        }
+    }
+}
+
